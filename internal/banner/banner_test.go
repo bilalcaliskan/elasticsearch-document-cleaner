@@ -13,6 +13,7 @@ func TestInitBanner(t *testing.T) {
 	bannerBytes, err := ioutil.ReadFile("../../banner.txt")
 	if err != nil {
 		t.Errorf("%v\n", err.Error())
+		return
 	}
 
 	banner.Init(os.Stdout, true, false, strings.NewReader(string(bannerBytes)))

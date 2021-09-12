@@ -7,8 +7,11 @@ import (
 )
 
 func TestGetLogger(t *testing.T) {
-	_, err := zap.NewProduction()
+	logger, err := zap.NewProduction()
 	if err != nil {
 		t.Errorf("%v\n", err.Error())
+		return
 	}
+
+	logger.Info("successfully initialized a *zap.Logger!")
 }
