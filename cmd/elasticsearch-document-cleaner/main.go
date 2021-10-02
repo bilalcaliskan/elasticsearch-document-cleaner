@@ -3,7 +3,6 @@ package main
 import (
 	"elasticsearch-document-cleaner/internal/banner"
 	"elasticsearch-document-cleaner/internal/logging"
-
 	"go.uber.org/zap"
 )
 
