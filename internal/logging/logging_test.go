@@ -2,16 +2,11 @@ package logging
 
 import (
 	"testing"
-
-	"go.uber.org/zap"
 )
 
 func TestGetLogger(t *testing.T) {
-	logger, err := zap.NewProduction()
-	if err != nil {
-		t.Errorf("%v\n", err.Error())
-		return
-	}
-
-	logger.Info("successfully initialized a *zap.Logger!")
+	t.Log("getting logger")
+	logger := GetLogger()
+	t.Log("will try logger for debugging")
+	logger.Info("this is a test log by *zap.Logger!")
 }
