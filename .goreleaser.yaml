@@ -1,13 +1,12 @@
+---
 project_name: elasticsearch-document-cleaner
 env:
   - CGO_ENABLED=0
   - GOFLAGS=-mod=vendor
   - GO111MODULE=auto
-
 before:
   hooks:
     - go mod vendor
-
 builds:
   - id: binary
     goos:
@@ -18,3 +17,26 @@ builds:
     ldflags:
       - -s -w
     main: ./cmd/elasticsearch-document-cleaner/main.go
+archives:
+  - replacements:
+      amd64: x86_64
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+brews:
+  - name: elasticsearch-document-cleaner
+    tap:
+      # The token determines the release type (Github/Gitlab).
+      owner: bilalcaliskan
+      name: homebrew-tap
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+    folder: Formula
+    # Brew fails from multiple 32-bit arm versions.
+    # Specify which version should be used.
+    goarm: 6
+    homepage: https://github.com/bilalcaliskan/oreilly-trial
+    license: apache-2.0
+    description: elasticsearch-document-cleaner cleans documents in an Elasticsearch index with specific conditions
