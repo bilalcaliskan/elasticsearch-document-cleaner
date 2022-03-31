@@ -37,6 +37,6 @@ brews:
     # Brew fails from multiple 32-bit arm versions.
     # Specify which version should be used.
     goarm: 6
-    homepage: https://github.com/bilalcaliskan/oreilly-trial
+    homepage: https://github.com/bilalcaliskan/elasticsearch-document-cleaner
     license: apache-2.0
     description: elasticsearch-document-cleaner cleans documents in an Elasticsearch index with specific conditions
