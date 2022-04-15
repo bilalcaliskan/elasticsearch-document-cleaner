@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/dimiro1/banner v1.1.0
 	github.com/spf13/pflag v1.0.5
+	go.uber.org/automaxprocs v1.5.1
 	go.uber.org/zap v1.21.0
 )
 
@@ -13,5 +14,5 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/sys v0.0.0-20220325203850-36772127a21f // indirect
+	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 )
