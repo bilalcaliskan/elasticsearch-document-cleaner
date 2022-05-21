@@ -1,0 +1,6 @@
+FROM gcr.io/distroless/static:nonroot-amd64
+
+ADD elasticsearch-document-cleaner /usr/local/bin/elasticsearch-document-cleaner
+
+USER nonroot
+ENTRYPOINT ["elasticsearch-document-cleaner"]

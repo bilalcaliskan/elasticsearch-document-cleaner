@@ -1,6 +1,3 @@
-lint:
-	golangci-lint run --timeout 2m0s
-
 fmt:
 	go fmt ./...
 
