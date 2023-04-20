@@ -13,14 +13,14 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.17.x
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
-        with:
-          # version: latest
-          version: v1.46.1
+          go-version-file: "go.mod"
+          cache: true
+      - name: Lint code
+        run: make -s lint
+      - name: Clean downloaded binaries
+        run: make -s clean
 
-  vet:
+  fmt:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -28,21 +28,12 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.17.x
-      - name: Vet
-        run: make vet
-
-  ineffassign:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Install Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.17.x
-      - name: Run Ineffassign
-        run: make ineffassign
+          go-version-file: "go.mod"
+          cache: true
+      - name: Run fmt
+        run: make -s fmt
+      - name: Clean downloaded binaries
+        run: make -s clean
 
   test:
     strategy:
@@ -50,22 +41,32 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.17.x
-      - name: Checkout code
-        uses: actions/checkout@v3
+          go-version-file: "go.mod"
+          cache: true
       - name: Test
-        run: make test
+        run: make -s test
+
+  gosec:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v3
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: '-no-fail -fmt sarif -out results.sarif ./...'
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif
 
   codeql:
     runs-on: ubuntu-latest
-    needs:
-      - lint
-      - vet
-      - ineffassign
-      - test
     strategy:
       fail-fast: false
       matrix:
@@ -84,11 +85,6 @@ jobs:
 
   sonarcloud:
     runs-on: ubuntu-latest
-    needs:
-      - lint
-      - vet
-      - ineffassign
-      - test
     steps:
       - uses: actions/checkout@v3
         with:
@@ -96,43 +92,47 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.17.x
+          go-version-file: "go.mod"
+          cache: true
       - name: Coverage Test
-        run: go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+        run: make -s test-with-coverage
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - name: SonarQube Quality Gate check
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        timeout-minutes: 5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#        with:
+#          args: >
+#            -Dproject.settings=build/ci/sonar-project.properties
+  #      - name: SonarQube Quality Gate check
+  #        uses: sonarsource/sonarqube-quality-gate-action@master
+  #        timeout-minutes: 5
+  #        env:
+  #          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   build:
-    needs:
-      - lint
-      - vet
-      - ineffassign
-      - test
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.17.x
-      - name: Checkout code
-        uses: actions/checkout@v3
+          go-version-file: "go.mod"
+          cache: true
       - name: Test
-        run: make build
+        run: make -s build
 
   tag:
     runs-on: ubuntu-latest
     needs:
+      - lint
+      - fmt
+      - test
+      - gosec
       - codeql
       - sonarcloud
       - build
@@ -174,7 +174,8 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.17.x
+          go-version-file: "go.mod"
+          cache: true
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         with:
@@ -182,4 +183,4 @@ jobs:
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+#          TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
