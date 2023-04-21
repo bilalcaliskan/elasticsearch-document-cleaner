@@ -108,7 +108,7 @@ update: tidy
 .PHONY: build
 build: tidy
 	echo "building binary..."
-	go build -o bin/main main.go || (echo an error while building binary, exiting!; sh -c 'exit 1';)
+	go build -o bin/main cmd/elasticsearch-document-cleaner/main.go || (echo an error while building binary, exiting!; sh -c 'exit 1';)
 	echo "binary built successfully!"
 
 .PHONY: run

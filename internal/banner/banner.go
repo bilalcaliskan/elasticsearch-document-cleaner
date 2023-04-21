@@ -1,7 +1,6 @@
 package banner
 
 import (
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -9,6 +8,6 @@ import (
 )
 
 func InitBanner() {
-	bannerBytes, _ := ioutil.ReadFile("banner.txt")
+	bannerBytes, _ := os.ReadFile("banner.txt")
 	banner.Init(os.Stdout, true, false, strings.NewReader(string(bannerBytes)))
 }
